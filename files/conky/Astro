@@ -1,0 +1,69 @@
+-- vim: set ft=lua:
+conky.config = {
+    alignment = 'middle_left',
+	background = false,
+	imlib_cache_size = 0,
+	gap_x = 45,
+	gap_y = 10,
+	maximum_width = 275,
+	minimum_width = 600,
+	minimum_height = 600,
+	border_inner_margin = 5,
+	border_outer_margin = 0,
+	border_width = 5,
+	draw_borders = false,
+	draw_graph_borders = true,
+	draw_outline = false,
+	draw_shades = false,
+	double_buffer = true,
+	override_utf8_locale = true,
+    	own_window = true,
+    	own_window_class = 'override',
+    	own_window_type = 'Conky',
+	own_window_transparent = true,
+	own_window_hints = 'undecorated,below,skip_taskbar,skip_pager,sticky',
+	own_window_argb_visual = true,
+	own_window_argb_value = 0,
+	text_buffer_size = 5000,
+	total_run_times = 0,
+	update_interval = 1,
+	uppercase = false,
+	use_xft = true,
+	xftalpha = 1,
+	short_units = false,
+	font = 'Inspira:pixelsize=12',
+	default_color = '8A8888', -- Light Grey
+	color1 = 'FFFFFF', -- White
+	color2 = '1789DB', -- Blue
+	color3 = '24D4C2', -- Teal
+}
+
+conky.text = [[
+${image $HOME/.config/conky/images/nasa_sun.jpg -p 0,44 -s 110x110}
+${color1}${font}${exec hostname} ${color1}${color}${hr}
+
+${color}${goto 142}${font}OS:  ${color1}${exec cat /etc/os-release | grep '^NAME=' | cut -d'=' -f2 | tr -d '"'}
+${color}${goto 142}${font}Kernel:  ${color1}${exec uname -r}
+${color}${goto 142}${font}DE:  ${color1}${exec echo $XDG_CURRENT_DESKTOP}
+${color}${goto 142}${font}Uptime:  ${color1}${uptime -p}
+${color}${goto 142}${font}Battery:  ${color1}${exec upower -i $(upower -e | grep BAT) | grep "percentage" | awk '{print $2}'}
+${color}${goto 142}${font}Packages:  ${color1}${exec rpm -qa | wc -l}
+${color}${goto 142}${font}Shell:  ${color1}${exec echo $SHELL | cut -d'/' -f3}
+${color1}${font}SYSTEM RESOURCES ${color1}${hr}
+#------------- SYSTEM RESOURCES -----------------------------------------------------
+
+${color}CPU ${color0}${alignr}${cpu cpu0}%
+${color3}${cpubar cpu0 5,}
+${color}RAM ${color0}${alignr}${mem}
+${color3}${membar 5,}
+${color}STORAGE ${color0}${alignr}${fs_used /} / ${fs_size /}
+${color3}${fs_bar 5 /}
+
+${color1}${font}MOON ${color}${hr}
+#---------------------- Moon Data ---------------------------------------------------------------
+${image $HOME/.config/conky/tmp/current_moon.png -p 170,345 -s 55x55}
+${color1}${voffset -10}${goto 60}${exec sed -n '1p' $HOME/.config/conky/tmp/moon_data}
+${color}${voffset 0}${goto 60}Illumination: ${color2}${exec sed -n '2p' $HOME/.config/conky/tmp/moon_data}
+${color}${voffset 0}${goto 60}Next Full:  ${color1}${exec sed -n '3p' $HOME/.config/conky/tmp/moon_data}
+${color}${hr}
+]];

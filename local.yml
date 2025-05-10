@@ -1,0 +1,175 @@
+- hosts: localhost
+  connection: local
+  roles:
+    - role: roles/luizgavalda.gnome_extensions
+      vars:
+        gnome_extension_ids:
+          - 3193
+          - 19
+          - 615
+          - 1160
+          - 3628
+
+  tasks:
+    - name: Enable the Ghostty COPR repository
+      become: true
+      community.general.copr:
+        name: pgdev/ghostty
+        state: enabled
+    - name: Enable the Starship COPR repository
+      become: true
+      community.general.copr:
+        name: atim/starship
+        state: enabled
+
+    - name: install packages
+      become: true
+      package:
+        name:
+          - htop
+          - gnome-tweaks
+          - ghostty
+          - starship
+          - papirus-icon-theme
+          - sushi
+          - dconf
+          - zsh
+          - neovim
+          - ripgrep
+          - bat
+          - tmux
+          - fzf
+          - zoxide
+          - zsh-autosuggestions
+          - zsh-syntax-highlighting
+          - tldr
+          - eza
+          - trash-cli
+          - flatpak
+          - dnf5-plugin-automatic
+          - go
+          - rust
+          - cargo
+          - crontab
+        state: latest
+        allowerasing: true
+
+    - name: install htmlq
+      cargo:
+        name: htmlq
+        state: latest
+
+    - name: Create config file for dnf5-automatic
+      become: true
+      copy:
+          src: files/dnf5-automatic.conf
+          dest: /etc/dnf/automatic.conf
+          owner: root
+          group: root
+          mode: '0644'
+
+    - name: Enable and Start dnf automatic updates
+      become: true
+      systemd_service:
+        name: dnf5-automatic.timer
+        state: started
+        enabled: true
+
+    - name: Remove unwanted applications
+      become: true
+      package:
+        name:
+          - gnome-classic-session
+          - gnome-shell-extension-background-logo
+          - gnome-shell-extension-window-list
+          - gnome-shell-extension-apps-menu
+          - gnome-shell-extension-common
+          - gnome-shell-extension-launch-new-instance
+          - gnome-shell-extension-places-menu
+          - gnome-user-docs
+          - gnome-tour
+          - libreoffice*
+          - firefox
+          - ptyxis
+          - unoconv
+        autoremove: true
+        state: absent
+
+    - name: Add Flathub repository
+      become: true
+      command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    - name: Install Flatpak applications
+      become: true
+      command: flatpak install -y flathub {{ item }}
+      with_items:
+        - com.mattjakeman.ExtensionManager
+        - app.zen_browser.zen
+        - org.onlyoffice.desktopeditors
+        - com.discordapp.Discord
+
+    - name: copy wallpaper file
+      become: true
+      copy:
+        src: files/wallpaper.png
+        dest: /usr/share/backgrounds/wallpaper.png
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+
+    - name: Apply GNOME settings
+      become: true
+      copy:
+        src: files/dconf.ini
+        dest: /etc/dconf/db/local.d/dconf.ini
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+
+    - name: Ensure Neovim config directory exists
+      become: false
+      file:
+        path: "/home/{{ ansible_user_id }}/.config/nvim"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0755'
+
+    - name: Ensure Ghostty config directory exists
+      become: false
+      file:
+        path: "/home/{{ ansible_user_id }}/.config/ghostty"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0755'
+
+    - name: Setup git, zsh, tmux, neovim and ghostty configrations
+      become: false
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+      with_items:
+        - { src: 'files/gitconfig', dest: "/home/{{ ansible_user_id }}/.gitconfig" }
+        - { src: 'files/zshrc', dest: "/home/{{ ansible_user_id }}/.zshrc" }
+        - { src: 'files/tmux', dest: "/home/{{ ansible_user_id }}/.tmux.conf" }
+        - { src: 'files/nvim', dest: "/home/{{ ansible_user_id }}/.config/nvim/init.lua" }
+        - { src: 'files/ghostty', dest: "/home/{{ ansible_user_id }}/.config/ghostty/config" }
+        - { src: 'files/conky', dest: "/home/{{ ansible_user_id }}/.config/" }
+
+    - name: Change default shell to Zsh
+      become: true
+      user:
+        name: "{{ ansible_user_id }}"
+        shell: /bin/zsh
+
+    - name: Install Sweet Theme
+      become: true
+      git: 
+        repo: https://github.com/EliverLara/Sweet
+        dest: /usr/share/themes/Sweet
+        version: "Ambar-Blue-Dark"
+
+    - name: Reload dconf Config
+      become: true
+      command: dconf update

@@ -1,0 +1,121 @@
+# completion cache path setup
+typeset -g comppath="$HOME/.cache"
+typeset -g compfile="$comppath/.zcompdump"
+
+if [[ -d "$comppath" ]]; then
+	[[ -w "$compfile" ]] || rm -rf "$compfile" >/dev/null 2>&1
+else
+	mkdir -p "$comppath"
+fi
+
+WORDCHARS=${WORDCHARS//\/} # Don't consider certain characters part of the word
+
+# configure key keybindings
+bindkey -e                                        # emacs key bindings
+bindkey ' ' magic-space                           # do history expansion on space
+bindkey '^U' backward-kill-line                   # ctrl + U
+bindkey '^[[3;5~' kill-word                       # ctrl + Supr
+bindkey '^[[3~' delete-char                       # delete
+bindkey '^[[1;5C' forward-word                    # ctrl + ->
+bindkey '^[[1;5D' backward-word                   # ctrl + <-
+bindkey '^ ' autosuggest-accept
+
+# History configurations
+HISTFILE="$comppath/.zsh_history"
+HISTSIZE=1000
+SAVEHIST=2000
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt share_history         # share command history data
+
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+#######################################################
+# GENERAL ALIAS'S
+#######################################################
+
+# Set the default editor
+export EDITOR=nvim
+export VISUAL=nvim
+alias vi='nvim'
+alias vim="nvim"
+alias svi='sudo nvim'
+
+alias grep='rg'
+unset GREP_OPTIONS
+
+# Alias's to modified commands
+alias ip="ip -c"
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='trash -v'
+alias cat="bat"
+alias mkdir='mkdir -p'
+alias pst="wl-paste"
+alias cpy="wl-copy"
+
+# cd into the old directory
+alias ...='cd "$OLDPWD"'
+
+alias cd="z"
+alias ..="cd .."
+alias ls="eza --icons"
+alias la="eza -a --icons"
+alias ll="eza -l --icons --total-size"
+alias lt="eza --icons --tree -I .git"
+
+man() { 
+    if ! /usr/bin/man $1; then 
+        goman $1 | less -R; 
+    fi; 
+}
+
+len() {
+    echo ${#1}
+}
+
+ppt2txt() {
+    unzip -qc "$1" "ppt/slides/slide*.xml" |
+    grep -oP '(?<=\<a:t\>).*?(?=\</a:t\>)'
+}
+
+# Dont open tmux in tty or ssh
+if [[ $(tty) == *"pts"* ]]; then
+	if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+		tmux attach -t main &> /dev/null || tmux new -s main &> /dev/null 
+	fi
+fi
+
+export PATH="$PATH:$HOME/go/bin:$HOME/.local/bin:$HOME/.cargo/bin"
+export MANPATH="/usr/share/man:/usr/local/share/man:$MANPATH"
+
+#########################################
+# Daily random knowledge		#
+# But it makes the terminal slower	#
+#########################################
+# # The Art of Command Line
+# taocl() {
+#   curl -s https://raw.githubusercontent.com/jlevy/the-art-of-command-line/master/README.md |
+#   grep -v 'cowsay.png' |
+#   awk '/^ *- / {print substr($0, 3)}' |
+#   sed 's/[\[\]]/ /g' |
+#   shuf -n 1
+# }
+#
+# # The Book of Secret Knowledge
+# tbosk() {
+#   curl -s https://raw.githubusercontent.com/trimstray/the-book-of-secret-knowledge/refs/heads/master/README.md |
+#   grep "&nbsp;&nbsp;" |
+#   sed -E 's/.*<a href="([^"]+)">.*<\/a> - (.*)<br>.*/\2 (\1)/g' |
+#   shuf -n 1
+# }
+#
+# cows=(`cowsay -l | sed '1d' | grep -v "kiss"`)
+# cowsay -f ${cows[$((RANDOM % ${#cows[@]}))]} $(echo -e "`taocl`\n`tbosk`" | shuf -n1) | lolcat
+
+source <(fzf --zsh)
+eval "$(zoxide init zsh)"
+eval "$(starship init zsh)"
+
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh 
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

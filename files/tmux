@@ -1,0 +1,51 @@
+set-option -g default-terminal "tmux-256color"
+set-option -sa terminal-overrides ",xterm*:Tc"
+
+set-option -g focus-events on
+
+set -g mouse on
+bind s split-window -v -c "#{pane_current_path}"
+bind v split-window -h -c "#{pane_current_path}"
+
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+bind-key -r -T prefix       M-k              resize-pane -U 5
+bind-key -r -T prefix       M-j            resize-pane -D 5
+bind-key -r -T prefix       M-h            resize-pane -L 5
+bind-key -r -T prefix       M-l           resize-pane -R 5
+bind-key -r -T prefix       C-k              resize-pane -U
+bind-key -r -T prefix       C-j            resize-pane -D
+bind-key -r -T prefix       C-h            resize-pane -L
+bind-key -r -T prefix       C-l           resize-pane -R
+
+bind x kill-pane
+
+set -g prefix ^S
+set -g base-index 1
+set -g detach-on-destroy off
+set -g escape-time 0
+set -g history-limit 1000000
+set -g renumber-windows on
+set -g set-clipboard on
+set -g default-terminal "${TERM}"
+set -g status-left-length 20
+
+setw -g mode-keys vi
+
+# default statusbar colors
+set-option -g status-style bg=#000000,fg=colour12
+
+# active window title colors
+set-window-option -g window-status-current-style fg=colour39,bg=default,bright
+set-window-option -g window-status-current-format "#I:#W"
+
+# pane border
+set-option -g pane-border-style fg=colour33
+set-option -g pane-active-border-style fg=colour39
+
+# pane number display
+set-option -g display-panes-active-colour colour39
+set-option -g display-panes-colour colour12
