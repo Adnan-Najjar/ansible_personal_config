@@ -1,9 +1,18 @@
-# True color settings
 set -g default-terminal "$TERM"
 set -ag terminal-overrides ",$TERM:Tc"
 set-option -g focus-events on
 set -g prefix ^S
+set -gq allow-passthrough on
+set -g base-index 1
+setw -g pane-base-index 1
+set-option -g renumber-windows on
 
-bind-key "e" display-popup -E -w 50% "$HOME/.local/bin/tmux-sessionizer.sh"
+set -g status-style fg=#62a0ea 
+set -g status-left "#[fg=#ffbe6f,bold] #S "
+set -g status-left-length 100
+set -g window-status-format "#I:#W"
+set -g window-status-current-format "#[fg=#ffbe6f,bold]#I:#W "
+set -g status-right '#(tmux ls -F " ##S" | grep -v "$(tmux display -p "#{session_name}")" | tr "\\n" " " | sed "s/ $//" )'
+set -g status-justify absolute-centre
 
-set-option -g status-style bg=#000000,fg=colour252
+bind-key a display-popup -E -w 50% -h 40% -x C -y C "$HOME/.local/bin/tmux-sessionizer.sh"

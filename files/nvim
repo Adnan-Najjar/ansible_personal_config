@@ -5,9 +5,6 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.have_nerd_font = true
 vim.opt.nu = true
 vim.opt.relativenumber = true
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.softtabstop = 4
 vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
@@ -27,21 +24,57 @@ vim.opt.showtabline = 2
 vim.opt.showmode = false
 vim.opt.laststatus = 3
 
+-- Install Plugins
+vim.pack.add({
+  -- Completion
+  { src = "https://github.com/hrsh7th/nvim-cmp" },
+  { src = "https://github.com/hrsh7th/cmp-nvim-lsp" },
+  { src = "https://github.com/hrsh7th/cmp-buffer" },
+  { src = "https://github.com/hrsh7th/cmp-path" },
+  { src = "https://github.com/hrsh7th/cmp-cmdline" },
+  -- Snippets
+  { src = "https://github.com/L3MON4D3/LuaSnip" },
+  { src = "https://github.com/saadparwaiz1/cmp_luasnip" },
+  -- LSP
+  { src = "https://github.com/neovim/nvim-lspconfig" },
+  -- Treesitter
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+  -- Markdown / markup tools
+  { src = "https://github.com/OXY2DEV/markview.nvim" },
+  -- UI / Icons
+  { src = "https://github.com/nvim-tree/nvim-web-devicons" },
+  -- Git
+  { src = "https://github.com/lewis6991/gitsigns.nvim" },
+  -- Misc
+  { src = "https://github.com/tpope/vim-sleuth" },
+  { src = "https://github.com/folke/tokyonight.nvim" },
+  { src = "https://github.com/nvim-lualine/lualine.nvim" },
+  { src = "https://github.com/echasnovski/mini.files" },
+  { src = "https://github.com/folke/snacks.nvim" },
+})
+
 -- Tab management
-vim.keymap.set("n", "<A-1>", ":tabnext 1<cr>")
-vim.keymap.set("n", "<A-2>", ":tabnext 2<cr>")
-vim.keymap.set("n", "<A-3>", ":tabnext 3<cr>")
-vim.keymap.set("n", "<A-4>", ":tabnext 4<cr>")
-vim.keymap.set("n", "<A-w>", ":tabclose<cr>")
-vim.keymap.set("n", "<A-a>", ":tabnew<cr>")
-vim.keymap.set("n", "<A-n>", ":tabnext<cr>")
+local tab_keybinds = {
+	["<A-1>"] = ":tabnext 1<CR>",
+	["<A-2>"] = ":tabnext 2<CR>",
+	["<A-3>"] = ":tabnext 3<CR>",
+	["<A-4>"] = ":tabnext 4<CR>",
+	["<A-w>"] = ":tabclose<CR>",
+	["<A-a>"] = ":tabnew<CR>",
+	["<A-n>"] = ":tabnext<CR>",
+}
+-- Manage tabs in normal and terminal mode
+for key, cmd in pairs(tab_keybinds) do
+	vim.keymap.set("n", key, cmd, { noremap = true, silent = true })
+	vim.keymap.set("t", key, "<C-\\><C-n>" .. cmd, { noremap = true, silent = true })
+end
+
 -- Window management
 vim.keymap.set("n", "<C-h>", "<c-w><c-h>")
 vim.keymap.set("n", "<C-l>", "<c-w><c-l>")
 vim.keymap.set("n", "<C-j>", "<c-w><c-j>")
 vim.keymap.set("n", "<C-k>", "<c-w><c-k>")
-vim.keymap.set("n", "<C-w>g", ":vert sball<cr>", { desc = "Split all buffers" })
-vim.keymap.set("n", "<C-w>t", ":tab sball<cr>", { desc = "Tab all splits" })
+vim.keymap.set("n", "<C-w>S", ":vert sball<cr>", { desc = "Split all buffers" })
 
 -- Quality of Life
 vim.cmd([[
@@ -53,7 +86,6 @@ vim.keymap.set("v", "J", ":m '>+1<cr>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<cr>gv=gv")
 vim.keymap.set({ "n", "v" }, "<leader>d", [[d]])
 vim.keymap.set({ "n", "v" }, "d", [["_d]])
-vim.keymap.set({ "n", "v" }, "d", [["_d]])
 vim.keymap.set("x", "p", [["_dP]])
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
@@ -64,31 +96,21 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 		vim.highlight.on_yank()
 	end,
 })
-
--- Install Plugins
-vim.pack.add({
-	{ src = "https://github.com/nvim-tree/nvim-web-devicons" },
-	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
-	-- LSP
-	{ src = "https://github.com/neovim/nvim-lspconfig" },
-	{ src = "https://github.com/mason-org/mason.nvim" },
-	{ src = "https://github.com/mason-org/mason-lspconfig.nvim" },
-	{ src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim" },
-	-- Autocompletion
-	{ src = "https://github.com/Saghen/blink.cmp" },
-	-- Syntax highlighting
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-	{ src = "https://github.com/OXY2DEV/markview.nvim" },
-	{ src = "https://github.com/RRethy/vim-illuminate" },
-	-- AI
-	{ src = "https://github.com/supermaven-inc/supermaven-nvim" },
-	-- Other
-	{ src = "https://github.com/folke/tokyonight.nvim" },
-	{ src = "https://github.com/echasnovski/mini.pick" },
-	{ src = "https://github.com/echasnovski/mini.files" },
-	{ src = "https://github.com/mbbill/undotree" },
-	{ src = "https://github.com/rmagatti/auto-session" },
-	{ src = "https://github.com/nvim-lualine/lualine.nvim" },
+-- Folding
+-- Auto folding configuration
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "*",
+	callback = function()
+		local parsers = require("nvim-treesitter.parsers")
+		if parsers.has_parser() then
+			vim.wo.foldmethod = "expr"
+			vim.wo.foldexpr   = "nvim_treesitter#foldexpr()"
+		else
+			vim.wo.foldmethod = "syntax"
+		end
+		vim.wo.foldlevel = 99
+		vim.wo.foldenable = true
+	end,
 })
 
 -- Gitsgins
@@ -106,11 +128,7 @@ require("tokyonight").setup()
 vim.cmd.colorscheme("tokyonight-night")
 vim.cmd([[ highlight Normal ctermbg=none guibg=none ]])
 -- Lualine
-require('lualine').setup()
--- Picker
-require("mini.pick").setup()
-vim.keymap.set("n", "<leader>f", ":Pick files<CR>")
-vim.keymap.set("n", "<leader>b", ":Pick buffers<CR>")
+require("lualine").setup()
 -- File explorer
 require("mini.files").setup({
 	mappings = {
@@ -118,112 +136,122 @@ require("mini.files").setup({
 		synchronize = 's',
 		go_in_plus = "<CR>",
 	},
+	windows = {
+		preview = true,
+		width_preview = 50,
+	},
 })
 vim.keymap.set("n", "<leader>e", function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end)
 vim.keymap.set("n", "<leader>E", ":Open .<CR>")
--- Session manager
-require("auto-session").setup({
-	suppressed_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+-- Snacks
+-- Make picker preview wider
+local layouts = require("snacks.picker.config.layouts")
+layouts["wider_preview"] = vim.tbl_deep_extend("force", layouts["default"], {
+	layout = {
+		box    = "horizontal",
+		width  = 0.9,
+		height = 0.8,
+		{ win = "list",    width = 0.3 },
+		{ win = "preview", width = 0.7 },
+	},
 })
--- Undotree
-vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
--- Supermaven
-require("supermaven-nvim").setup({
-	log_level = "off",
-	keymaps = {
-		accept_suggestion = "<C-e>",
-	}
-})
+require('snacks').setup {
+	input = { enabled = true },
+	bigfile = { enabled = true },
+	quickfile = { enabled = true },
+	picker = { enabled = true, layout = { preset = "wider_preview" } },
+	notifier = { enabled = true },
+	scope = { enabled = true },
+	words = { enabled = true },
+	indent = { enabled = true },
+	scroll = { enabled = true },
+	terminal = {
+		win = {
+			keys = {
+				term_normal = {
+					"<esc>",
+					function() vim.cmd("stopinsert") end,
+					mode = "t",
+					desc = "Single escape to normal mode",
+				},
+			},
+			wo = { winbar = "" },
+		},
+	},
+	image = { enabled = true },
+}
+-- Picker
+vim.keymap.set("n", "<leader><space>", function() Snacks.picker.zoxide({ layout = { preset = "vscode" } }) end)
+vim.keymap.set("n", "<leader>/", function() Snacks.picker.grep() end)
+vim.keymap.set("n", "<leader>b", function() Snacks.picker.buffers() end)
+-- All pickers
+vim.keymap.set("n", "<leader>a", function() Snacks.picker.pickers() end)
+-- Undo history
+vim.keymap.set("n", "<leader>u", function() Snacks.picker.undo() end)
+-- Git
+vim.keymap.set("n", "<leader>gd", function() Snacks.picker.git_diff() end)
+vim.keymap.set("n", "<leader>gb", function() Snacks.git.blame_line() end)
+-- Open current file in Github
+vim.keymap.set("n", "<leader>gh", function() Snacks.gitbrowse() end)
 -- Terminal
-local term_buf = nil
-local term_win = nil
-vim.keymap.set({ "n", "t" }, "<leader><leader>", function()
-	if term_win and vim.api.nvim_win_is_valid(term_win) then
-		if vim.api.nvim_get_current_win() == term_win then
-			vim.cmd.hide()
-		else
-			vim.api.nvim_set_current_win(term_win)
-			vim.cmd.startinsert()
-		end
-		return
-	end
-	if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
-		vim.cmd.split()
-		vim.cmd.wincmd("J")
-		vim.api.nvim_win_set_height(0, 10)
-		vim.api.nvim_win_set_buf(0, term_buf)
-		term_win = vim.api.nvim_get_current_win()
-		vim.cmd.startinsert()
-		return
-	end
-	vim.cmd.split()
-	vim.cmd.term()
-	vim.cmd.wincmd("J")
-	vim.api.nvim_buf_set_name(0, "Terminal")
-	vim.api.nvim_win_set_height(0, 10)
-	term_win = vim.api.nvim_get_current_win()
-	term_buf = vim.api.nvim_get_current_buf()
-	vim.fn.chansend(vim.b.terminal_job_id, "clear\n")
-	vim.cmd.startinsert()
-end, { desc = "Toggle terminal" })
-vim.keymap.set("t", "", "<C-\\><C-n>")
-vim.cmd("highlight! link NormalNC Normal")
-
+vim.keymap.set({ "n", "t" }, "<C-Space>", function()
+	local term = Snacks.terminal
+	term.toggle()
+	vim.api.nvim_buf_set_name(term.get().buf, " Terminal")
+end)
+-- Diagnostics toggle
+Snacks.toggle.diagnostics():map("<leader>h")
+-- Zen mode toggle
+Snacks.toggle.zen():map("<leader>z")
 -- LSP setup
 vim.diagnostic.config({
 	virtual_text = true,
 	underline = true,
 	signs = true,
 })
--- Mason setup
-require("mason").setup()
-require("mason-lspconfig").setup()
-require("mason-tool-installer").setup({
-	ensure_installed = {
-		"lua_ls",
-		"stylua",
-		"gopls",
-		"pyright",
-		"bashls",
-	},
-})
 -- Treesitter setup
 require("nvim-treesitter.install").prefer_git = true
 require("nvim-treesitter.install").compilers = { "zig", "gcc" }
 require("nvim-treesitter.configs").setup {
-	auto_install = true,
+	parser_install_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/",
+	auto_install = false,
 	highlight = {
 		enable = true,
 	},
 	indent = { enable = true },
 }
 -- LSP completion setup
-require("blink.cmp").setup({
-	signature = { enabled = true },
-	fuzzy = {
-		implementation = "lua",
+vim.lsp.enable('lua_ls')
+vim.lsp.enable('gopls')
+vim.lsp.enable('pyright')
+vim.lsp.enable('nil_ls')
+vim.lsp.enable('tsserver')
+vim.lsp.enable('eslint')
+
+local cmp = require('cmp')
+local luasnip = require('luasnip')
+
+cmp.setup {
+	snippet = {
+		expand = function(args)
+			luasnip.lsp_expand(args.body)
+		end,
 	},
-	completion = {
-		documentation = { auto_show = true, auto_show_delay_ms = 500 },
-		menu = {
-			auto_show = true,
-			draw = {
-				treesitter = { "lsp" },
-				columns = { { "kind_icon", "label", "label_description", gap = 1 }, { "kind" } },
-			},
-		},
-	},
-})
+	mapping = cmp.mapping.preset.insert({
+		['<C-Space>'] = cmp.mapping.complete(),
+		['<Tab>'] = cmp.mapping.confirm({ select = true }),
+		['<C-n>'] = cmp.mapping.select_next_item(),
+		['<C-p>'] = cmp.mapping.select_prev_item(),
+	}),
+	sources = cmp.config.sources({
+		{ name = 'nvim_lsp' },
+		{ name = 'luasnip' },
+	}, {
+		{ name = 'buffer' },
+	})
+}
 -- LSP keymaps
 vim.keymap.set("n", "<leader>l", vim.lsp.buf.format)
 vim.keymap.set("n", "gd", vim.lsp.buf.definition)
--- Disable LSP errors on keybind
-local isLspDiagnosticsVisible = true
-vim.keymap.set("n", "<leader>h", function()
-	isLspDiagnosticsVisible = not isLspDiagnosticsVisible
-	vim.diagnostic.config({
-		virtual_text = isLspDiagnosticsVisible,
-		underline = isLspDiagnosticsVisible,
-		signs = true,
-	})
-end)
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)

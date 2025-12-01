@@ -29,6 +29,12 @@
           fastestmirror=True
       when: dnf_conf.stat.exists
 
+    - name: Enable the Ghostty COPR repository
+      become: true
+      community.general.copr:
+        name: pgdev/ghostty
+        state: enabled
+
     - name: Enable the Starship COPR repository
       become: true
       community.general.copr:

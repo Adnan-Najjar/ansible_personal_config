@@ -16,6 +16,12 @@ bindkey ' ' magic-space                           # do history expansion on spac
 bindkey '^[[1;5C' forward-word                    # ctrl + ->
 bindkey '^[[1;5D' backward-word                   # ctrl + <-
 bindkey '^X' edit-command-line                    # ctrl + x to open in editor
+
+# Open command in editor
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^X' edit-command-line                    # ctrl + x
+
 # Override -h and --help with bat
 alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
@@ -28,13 +34,6 @@ setopt hist_expire_dups_first # delete duplicates first when HISTFILE size excee
 setopt hist_ignore_dups       # ignore duplicated commands history list
 setopt share_history         # share command history data
 
-# Dont open tmux in tty or ssh
-if [[ $(tty) == *"pts"* ]]; then
-	if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-		tmux attach -t main &> /dev/null || tmux new -s main &> /dev/null 
-	fi
-fi
-
 #######################################################
 # GENERAL ALIAS'S
 #######################################################
@@ -44,10 +43,6 @@ export EDITOR=nvim
 export VISUAL=nvim
 alias vi="nvim"
 alias vim="nvim"
-alias svi="sudo nvim"
-
-alias grep='rg'
-unset GREP_OPTIONS
 
 # Alias's to modified commands
 alias ip="ip -c"
@@ -59,31 +54,32 @@ alias pst="wl-paste"
 alias cpy="wl-copy"
 alias urls="grep -oP -N --color=never 'http[s]?://\\S+'"
 
-# cd into the old directory
-alias ...='cd "$OLDPWD"'
-
 alias cd="z"
 alias ..="cd .."
 alias ls="eza --icons"
 alias la="eza -a --icons"
 alias ll="eza -l --icons --total-size"
 alias lt="eza --icons --tree -I .git --group-directories-first"
+alias open="xdg-open"
 
 len() {
     echo ${#1}
 }
 
-ppt2txt() {
-    unzip -qc "$1" "ppt/slides/slide*.xml" |
-    grep -oP '(?<=\<a:t\>).*?(?=\</a:t\>)'
-}
-
-export PATH="$PATH:$HOME/go/bin:$HOME/.local/bin:$HOME/.cargo/bin"
+export GOPAH="$HOME/.go"
+export PATH="$PATH:$GOPATH/bin:$HOME/.local/bin:$HOME/.cargo/bin"
 export MANPATH="/usr/share/man:/usr/local/share/man:$MANPATH"
-export MANPAGER="sh -c 'awk '\''{ gsub(/\x1B\[[0-9;]*m/, \"\", \$0); gsub(/.\x08/, \"\", \$0); print }'\'' | bat -p -lman'"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANROFFOPT="-c"
+export _ZO_EXCLUDE_DIRS="/nix:/tmp:/proc:/sys:/dev"
 export BAT_THEME="TwoDark"
 
-clear; fastfetch -c examples/9.jsonc
+if ! [ $NVIM ]; then
+	clear; fastfetch -c examples/9.jsonc
+	if ! [ $TMUX ]; then
+		  $HOME/.local/bin/tmux-sessionizer.sh
+	fi
+fi
 
 source <(fzf --zsh)
 eval "$(zoxide init zsh)"
